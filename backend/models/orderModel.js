@@ -19,6 +19,7 @@ const orderSchema = new mongoose.Schema(
         name: { type: String, required: true },
         quantity: { type: Number, required: true, default: 1 },
         price: { type: Number, required: true },
+        image: { type: String },
         product: {
           type: mongoose.Schema.ObjectId,
           ref: "Product",
@@ -35,7 +36,7 @@ const orderSchema = new mongoose.Schema(
     taxAmount: { type: Number, required: true, default: 0.0 },
     shippingAmount: { type: Number, required: true, default: 0.0 },
     totalAmount: { type: Number, required: true, default: 0.0 },
-    orderStatus: { type: Number, required: true, default: "processing" },
+    orderStatus: { type: String, required: true, default: "processing" },
     delveryDate: { type: Date, required: true, default: Date.now },
   },
 
