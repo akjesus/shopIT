@@ -10,12 +10,14 @@ const productRouter = require("./routes/productRoutes");
 const authRouter = require("./routes/authRoutes");
 const userRouter = require("./routes/userRoutes");
 const adminRouter = require("./routes/adminRoutes");
+const orderRouter = require("./routes/orderRoutes");
 
 //ASSIGNING ROUTES
 app.use("/api/v1", productRouter);
 app.use("/api/v1", authRouter);
 app.use("/api/v1", userRouter);
 app.use("/api/v1", adminRouter);
+app.use("/api/v1", orderRouter);
 
 //MIDDLEWARES
 app.use(errorMiddleware);

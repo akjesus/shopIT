@@ -1,4 +1,5 @@
 const User = require("../models/userModel");
+const Order = require("../models/orderModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
 
@@ -62,5 +63,17 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: `User Deleted Successfully!`,
+  });
+});
+
+//GET ALL ORDERS
+exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
+  const orders = await Order.find();
+  if (!orders) {
+    return new ErrorHandler("No order found", 404);
+  }
+  return res.status(200).json({
+    success: true,
+    message: `${orders.length} orders retrieved successfully`,
   });
 });

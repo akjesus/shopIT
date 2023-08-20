@@ -6,6 +6,7 @@ const {
   userDetails,
   updateUserProfile,
   deleteUser,
+  getAllOrders,
 } = require("../controllers/adminController");
 const {
   createProduct,
@@ -46,6 +47,13 @@ adminRouter.post(
   isAuthenticated,
   authorisedRoles("admin"),
   createProduct
+);
+
+adminRouter.get(
+  "/orders/all",
+  isAuthenticated,
+  authorisedRoles("admin"),
+  getAllOrders
 );
 
 module.exports = adminRouter;
