@@ -2,6 +2,7 @@ const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 const ErrorHandler = require("../utils/errorHandler");
 const catchAsyncErrors = require("../middlewares/catchAsyncErrors");
+const Product = require("../models/productModel");
 
 //GET ALL USERS
 exports.allUsers = catchAsyncErrors(async (req, res, next) => {
@@ -72,8 +73,45 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
   if (!orders) {
     return new ErrorHandler("No order found", 404);
   }
+  let totalAmount = 0;
+  orders.forEach((order) => {
+    totalAmount += order.totalAmount;
+  });
   return res.status(200).json({
     success: true,
     message: `${orders.length} orders retrieved successfully`,
+    ordersCount: orders.length,
+    totalAmount,
+    orders,
   });
 });
+
+//PROCESS ORDER / UPDATE STOCK
+exports.processOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return new ErrorHandler("No order found", 404);
+  }
+  if (order.orderStatus === "Delivered") {
+    return next(new ErrorHandler("You have already delivered this order", 400));
+  }
+  //   let totalAmount = 0;
+  //   totalAmount += item.price * item.quantity;
+  order.orderItems.forEach(async (item) => {
+    await updateStock(item.product, item.quantity);
+  });
+  order.orderStatus = req.body.status;
+  order.delveryDate = Date.now();
+  order.save();
+  return res.status(200).json({
+    success: true,
+    message: `Order processed successfully`,
+    order,
+  });
+});
+
+async function updateStock(id, quantity) {
+  const product = await Product.findById(id);
+  product.stock = product.stock - quantity;
+  await product.save();
+}
