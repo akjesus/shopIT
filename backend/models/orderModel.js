@@ -38,6 +38,8 @@ const orderSchema = new mongoose.Schema(
     totalAmount: { type: Number, required: true, default: 0.0 },
     orderStatus: { type: String, required: true, default: "processing" },
     delveryDate: { type: Date, required: true, default: Date.now },
+    deleted: { type: Boolean, default: false, select: false },
+    deletedAt: { type: Date },
   },
 
   { timestamps: true }

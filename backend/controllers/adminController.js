@@ -69,9 +69,9 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
 //GET ALL ORDERS
 exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find();
-  if (!orders) {
-    return new ErrorHandler("No order found", 404);
+  const orders = await Order.find({ deleted: false });
+  if (orders.length == 0) {
+    return next(new ErrorHandler("No order found", 404));
   }
   let totalAmount = 0;
   orders.forEach((order) => {
@@ -90,7 +90,7 @@ exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
 exports.processOrder = catchAsyncErrors(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
   if (!order) {
-    return new ErrorHandler("No order found", 404);
+    return next(new ErrorHandler("No order found", 404));
   }
   if (order.orderStatus === "Delivered") {
     return next(new ErrorHandler("You have already delivered this order", 400));
@@ -102,7 +102,7 @@ exports.processOrder = catchAsyncErrors(async (req, res, next) => {
   });
   order.orderStatus = req.body.status;
   order.delveryDate = Date.now();
-  order.save();
+  await order.save();
   return res.status(200).json({
     success: true,
     message: `Order processed successfully`,
@@ -110,8 +110,24 @@ exports.processOrder = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//DELETE ORDER(MARK AS DELETED)
+exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
+  const order = await Order.findById(req.params.id).select("+deleted");
+  if (!order) {
+    return next(new ErrorHandler("No order found", 404));
+  }
+  if (order.deleted === true) {
+    return next(new ErrorHandler("Order Deleted already", 400));
+  }
+  order.deleted = true;
+  await order.save();
+  return res
+    .status(202)
+    .json({ success: true, message: "Order deleted successfully!" });
+});
+
 async function updateStock(id, quantity) {
   const product = await Product.findById(id);
   product.stock = product.stock - quantity;
-  await product.save();
+  await product.save({ validateBeforeSave: false });
 }

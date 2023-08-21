@@ -26,7 +26,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     user: req.user._id,
   });
   if (!order) {
-    return new ErrorHandler("No order placed", 400);
+    return next(new ErrorHandler("No order placed", 400));
   }
   return res
     .status(200)
@@ -35,8 +35,8 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
 
 //GET ORDERS FOR CURRENTLY LOGGED IN USER
 exports.getOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find({ user: req.user.id });
-  if (!orders) {
+  const orders = await Order.find({ user: req.user.id, deleted: false });
+  if (orders.length > 0) {
     return next(new ErrorHandler("You have not placed an order yet", 404));
   }
 

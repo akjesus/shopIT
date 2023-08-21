@@ -8,6 +8,7 @@ const {
   deleteUser,
   getAllOrders,
   processOrder,
+  deleteOrder,
 } = require("../controllers/adminController");
 const {
   createProduct,
@@ -57,11 +58,9 @@ adminRouter.get(
   getAllOrders
 );
 
-adminRouter.patch(
-  "/admin/orders/:id",
-  isAuthenticated,
-  authorisedRoles("admin"),
-  processOrder
-);
+adminRouter
+  .route("/admin/orders/:id")
+  .patch(isAuthenticated, authorisedRoles("admin"), processOrder)
+  .delete(isAuthenticated, authorisedRoles("admin"), deleteOrder);
 
 module.exports = adminRouter;

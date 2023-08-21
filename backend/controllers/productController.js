@@ -83,3 +83,19 @@ exports.deleteProduct = catchAsyncErrors(async (req, res, next) => {
     message: `Product deleted successfully`,
   });
 });
+
+//CREATE PRODUCT REVIEW
+exports.addProductReview = catchAsyncErrors(async (req, res, next) => {
+  const { comment, rating, productId } = req.body;
+  if (!comment || !rating) {
+    return next(new ErrorHandler("Please provide a valid review", 400));
+  }
+  const review = { name: req.user.name, comment, rating: Number(rating) };
+  const product = await Product.findById(productId);
+  product.reviews.push(review);
+  product.numOfReviews += 1;
+  await product.save();
+  return res
+    .status(201)
+    .json({ success: true, message: "Review added succeessfully", review });
+});
