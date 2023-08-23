@@ -90,12 +90,59 @@ exports.addProductReview = catchAsyncErrors(async (req, res, next) => {
   if (!comment || !rating) {
     return next(new ErrorHandler("Please provide a valid review", 400));
   }
-  const review = { name: req.user.name, comment, rating: Number(rating) };
+  const review = {
+    name: req.user.name,
+    user: req.user._id,
+    comment,
+    rating: Number(rating),
+  };
+
   const product = await Product.findById(productId);
-  product.reviews.push(review);
-  product.numOfReviews += 1;
-  await product.save();
+  const isReviewed = product.reviews.find(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
+  if (isReviewed) {
+    product.reviews.forEach((review) => {
+      if (review.user.toString() === req.user._id.toString()) {
+        review.comment = comment;
+        review.rating = rating;
+      }
+    });
+  } else {
+    product.reviews.push(review);
+    product.numOfReviews += 1;
+  }
+  product.ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    product.reviews.length;
+  await product.save({ validateBeforeSave: false });
   return res
     .status(201)
     .json({ success: true, message: "Review added succeessfully", review });
+});
+
+//GET PRODUCT REVIEWS
+exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.id);
+  if (!product) {
+    return next(new ErrorHandler("No such product exists", 404));
+  }
+  return res.status(200).json({
+    success: true,
+    message: `${product.reviews.length} review(s) retrieved`,
+    reviews: product.reviews,
+  });
+});
+
+//DELETE PRODUCT REVIEWS
+exports.deletProductReview = catchAsyncErrors(async (req, res, next) => {
+  const product = await Product.findById(req.query.id);
+  if (!product) {
+    return next(new ErrorHandler("No such product exists", 404));
+  }
+  return res.status(200).json({
+    success: true,
+    message: `${product.reviews.length} review(s) retrieved`,
+    reviews: product.reviews,
+  });
 });

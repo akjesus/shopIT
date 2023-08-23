@@ -4,11 +4,13 @@ const {
   getProducts,
   getOneProduct,
   addProductReview,
+  getProductReviews,
 } = require("../controllers/productController");
 const { isAuthenticated } = require("../middlewares/authMiddleware");
 
 productRouter.get("/products", getProducts);
 productRouter.get("/products/:id", getOneProduct);
-productRouter.post("/review", isAuthenticated, addProductReview);
+productRouter.patch("/review", isAuthenticated, addProductReview);
+productRouter.get("/reviews", getProductReviews);
 
 module.exports = productRouter;
