@@ -136,13 +136,31 @@ exports.getProductReviews = catchAsyncErrors(async (req, res, next) => {
 
 //DELETE PRODUCT REVIEWS
 exports.deletProductReview = catchAsyncErrors(async (req, res, next) => {
-  const product = await Product.findById(req.query.id);
+  const product = await Product.findById(req.query.productId);
   if (!product) {
     return next(new ErrorHandler("No such product exists", 404));
   }
+  const available = product.reviews.find(
+    (r) => r._id.toString() === req.query.id.toString()
+  );
+  if (!available) {
+    return next(new ErrorHandler("No such review exists", 404));
+  }
+  const reviews = product.reviews.filter(
+    (review) => review._id.toString() !== req.query.id.toString()
+  );
+  const ratings =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) /
+    reviews.length;
+  const numOfReviews = reviews.length;
+  await Product.findByIdAndUpdate(
+    req.query.productId,
+    { reviews, ratings, numOfReviews },
+    { new: true, runValidators: true, useFindandModify: false }
+  );
   return res.status(200).json({
     success: true,
-    message: `${product.reviews.length} review(s) retrieved`,
-    reviews: product.reviews,
+    message: ` review(s) deleted`,
+    reviews,
   });
 });
