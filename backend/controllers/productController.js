@@ -26,12 +26,14 @@ exports.getProducts = catchAsyncErrors(async (req, res, next) => {
   if (!products.length) {
     return next(new ErrorHandler("No Product found!", 404));
   }
-  return res.status(200).json({
-    success: true,
-    productCount,
-    message: `(${products.length}) Product(s) retrieved successfully`,
-    products,
-  });
+  setTimeout(() => {
+    return res.status(200).json({
+      success: true,
+      productCount,
+      message: `(${products.length}) Product(s) retrieved successfully`,
+      products,
+    });
+  }, 1500);
 });
 
 //GET ONE PRODUCT
