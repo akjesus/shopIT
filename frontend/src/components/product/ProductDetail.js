@@ -16,7 +16,6 @@ const ProductDetail = () => {
   );
   useEffect(() => {
     dispatch(getProductDetail(id));
-
     if (error) {
       alert.error(error);
       dispatch(clearErrors());

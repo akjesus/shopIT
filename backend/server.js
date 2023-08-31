@@ -16,7 +16,7 @@ dotenv.config({ path: "backend/config/config.env" });
 const URI =
   process.env.NODE_ENV === "DEVELOPMENT"
     ? process.env.DATABASE_LOCAL
-    : process.env.DATABASE;
+    : process.env.DATABASE_LOCAL;
 connectDB(URI);
 
 //SETUP APP TO LISTEN

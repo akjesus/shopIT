@@ -50,6 +50,7 @@ export const productDetailReducer = (state = { product: {} }, action) => {
       return {
         loading: false,
         product: action.payload.product,
+        resPerPage: action.payload.resPerPage,
         message: action.payload.message,
       };
 
